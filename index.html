@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeLink - Organ Donors Management System</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+    background:#f4f7fb;
+    font-family:Arial, sans-serif;
+}
+
+.navbar{
+    background:#4682B4;
+}
+
+.navbar-brand{
+    color:white !important;
+    font-weight:bold;
+    font-size:28px;
+}
+
+.hero{
+    background:linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.6)),
+    url('https://images.unsplash.com/photo-1584515933487-779824d29309?q=80&w=1200');
+    background-size:cover;
+    background-position:center;
+    height:85vh;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+.hero h1{
+    font-size:55px;
+    font-weight:bold;
+}
+
+.hero p{
+    font-size:20px;
+}
+
+.btn-blue {
+    background:#4682B4;
+    color:white;
+    border:none;
+}
+
+.btn-blue:hover {
+    background:#5a9bd5;
+}
+
+.section-title{
+    text-align:center;
+    margin-top:50px;
+    margin-bottom:30px;
+    color:#4682B4;
+    font-weight:bold;
+}
+
+.card{
+    border:none;
+    border-radius:20px;
+    transition:0.3s;
+    box-shadow:0px 4px 15px rgba(0,0,0,0.1);
+}
+
+.card:hover{
+    transform:translateY(-8px);
+}
+
+.btn-custom{
+    background:#4682B4;
+    color:white;
+    border:none;
+}
+
+.btn-custom:hover{
+    background:linear-gradient(to right, #4682B4, #5a9bd5);
+}
+
+footer{
+    background:#111;
+    color:white;
+    padding:20px;
+    text-align:center;
+    margin-top:50px;
+}
+
+.dashboard-box{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.dashboard-box h2{
+    color:#4682B4;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+
+<nav class="navbar navbar-expand-lg">
+<div class="container">
+<a class="navbar-brand" href="#">Organ Donation Management</a>
+
+<button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+<span class="navbar-toggler-icon"></span>
+</button>
+
+<div class="collapse navbar-collapse" id="menu">
+<ul class="navbar-nav ms-auto">
+
+<!-- Admin Menu (Hidden by default) -->
+<li class="nav-item"
+id="adminMenu"
+style="display:none;">
+
+<a class="nav-link text-white"
+href="admin.html">
+
+Admin
+
+</a>
+</li>
+
+<!-- Admin Logged In Text -->
+<li class="nav-item"
+id="adminStatus"
+style="display:none;">
+
+<span class="nav-link text-warning fw-bold">
+
+Admin Logged In
+
+</span>
+
+</li>
+
+<li class="nav-item">
+<a class="nav-link text-white"
+href="login.html">
+
+Login
+
+</a>
+</li>
+
+</ul>
+</div>
+</div>
+</nav>
+
+<!-- Hero Section -->
+
+<section class="hero">
+<div>
+<h1>Organ Donors Management System</h1>
+<p>Save Lives Through Smart Organ Donation & AI Matching</p>
+
+<a href="register_donor.html"  class="btn btn-primary btn-lg mt-3">
+    Register as Donor
+</a>
+
+<a href="register_recipient.html"  class="btn btn-success btn-lg mt-3 ms-3">
+    Register as Recipient
+</a>
+
+</div>
+</section>
+
+<!-- Features -->
+
+<div class="container">
+
+<h2 class="section-title">Core Modules</h2>
+
+<div class="row g-4">
+
+<div class="col-md-4">
+<a href="total_donors.html" style="text-decoration:none; color:black;">
+<div class="card p-4">
+<h4>Total Donors</h4>
+<p>
+Register organ donors with blood group,
+medical history, and eligibility verification.
+</p>
+</div>
+</a>
+</div>
+
+<div class="col-md-4">
+<a href="total_recipients.html" style="text-decoration:none; color:black;">
+<div class="card p-4">
+<h4> Total Recipients</h4>
+<p>
+Manage patients, required organs,
+urgency levels, and transplant requests.
+</p>
+</div>
+</a>
+</div>
+
+<div class="col-md-4">
+<a href="organ-availability.html" style="text-decoration:none; color:black;">
+<div class="card p-4">
+<h4>Organ Availability</h4>
+<p>
+Track available organs and perform
+AI-based donor-recipient matching.
+</p>
+</div>
+</a>
+</div>
+
+<div class="col-md-4">
+<a href="hospital-management.html" style="text-decoration:none; color:black;">
+<div class="card p-4">
+<h4>Hospital Management</h4>
+<p>
+Manage transplant centers,
+ICU availability, and doctors.
+</p>
+</div>
+</a>
+</div>
+
+<div class="col-md-4">
+<a href="emergency-requests.html" style="text-decoration:none; color:black;">
+<div class="card p-4">
+<h4>Emergency Requests</h4>
+<p>
+Priority emergency alerts with
+real-time notifications and tracking.
+</p>
+</div>
+</a>
+</div>
+
+<div class="col-md-4">
+<a href="analytics.html" style="text-decoration:none; color:black;">
+<div class="card p-4">
+<h4>AI Analytics</h4>
+<p>
+Fraud detection, demand prediction,
+and intelligent organ allocation.
+</p>
+</div>
+</a>
+</div>
+
+<!-- Footer -->
+
+<!-- Footer -->
+<footer>
+
+<p>
+© 2026 LifeLink Organ Donors Management System
+</p>
+
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+// Get role saved during login
+const role = localStorage.getItem("role");
+
+// If admin logged in
+if(role === "admin"){
+
+    // Show Admin menu
+    document.getElementById("adminMenu")
+    .style.display = "block";
+
+    // Show Admin Logged In text
+    document.getElementById("adminStatus")
+    .style.display = "block";
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organ Availability</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f4f7fb;
+    font-family:Arial, sans-serif;
+}
+
+/* Navbar */
+.navbar{
+    background:#4682B4;
+}
+
+.navbar-brand{
+    color:white !important;
+    font-weight:bold;
+    font-size:28px;
+}
+
+/* Heading */
+.heading{
+    text-align:center;
+    margin:40px 0;
+    color:#4682B4;
+    font-weight:bold;
+}
+
+/* Cards */
+.card{
+    border:none;
+    border-radius:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+/* Status colors */
+.status-available{
+    color:green;
+    font-weight:bold;
+}
+
+.status-limited{
+    color:orange;
+    font-weight:bold;
+}
+
+/* Buttons */
+.btn-circle{
+    width:35px;
+    height:35px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+<div class="container">
+
+<a class="navbar-brand" href="index.html">
+Organ Donation Management
+</a>
+
+<a href="index.html" class="btn btn-light">
+🏠 Home
+</a>
+
+</div>
+</nav>
+
+<!-- Main Container -->
+<div class="container">
+
+<h2 class="heading">Available Organs (Live Data)</h2>
+
+<div class="row g-4" id="organContainer"></div>
+
+</div>
+
+<script>
+
+const isAdmin = new URLSearchParams(window.location.search).get("admin") === "true";
+
+async function loadOrgans() {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/api/organs");
+        const organs = await response.json();
+
+        const container = document.getElementById("organContainer");
+        container.innerHTML = "";
+
+        organs.forEach(o => {
+
+            let statusClass = o.status === "Available"
+                ? "status-available"
+                : "status-limited";
+
+            // ---------------- DONOR UI (ADMIN vs USER) ----------------
+            let donorUI = "";
+
+            if (isAdmin) {
+                donorUI = `
+                <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+
+                    <button class="btn btn-danger btn-circle"
+                        onclick="updateDonors(${o.id}, -1)">−</button>
+
+                    <span id="donor-${o.id}" class="fw-bold fs-5">
+                        ${o.available_donors}
+                    </span>
+
+                    <button class="btn btn-success btn-circle"
+                        onclick="updateDonors(${o.id}, 1)">+</button>
+
+                </div>`;
+            } else {
+                donorUI = `
+                <p><strong>Available Donors:</strong> ${o.available_donors}</p>
+                `;
+            }
+
+            // ---------------- CARD ----------------
+            container.innerHTML += `
+            <div class="col-md-4">
+                <div class="card p-4 text-center">
+
+                    <h3>${o.organ_name}</h3>
+
+                    <p><strong>Hospital:</strong> ${o.hospital_name || "N/A"}</p>
+
+                    <hr>
+
+                    <p><strong>Blood Group:</strong> ${o.blood_group}</p>
+
+                    ${donorUI}
+
+                    <p>
+                        <strong>Status:</strong>
+                        <span class="${statusClass}">
+                            ${o.status}
+                        </span>
+                    </p>
+
+                </div>
+            </div>`;
+        });
+
+    } catch (err) {
+        console.log(err);
+        document.getElementById("organContainer").innerHTML =
+            "<h4 class='text-danger text-center'>Failed to load organ data</h4>";
+    }
+}
+
+// ---------------- UPDATE DONORS (ADMIN ONLY) ----------------
+async function updateDonors(id, change) {
+
+    if (!isAdmin) {
+        alert("Unauthorized access");
+        return;
+    }
+
+    let current = document.getElementById(`donor-${id}`).innerText;
+    let newValue = parseInt(current) + change;
+
+    if (newValue < 0) return;
+
+    try {
+        const res = await fetch(`http://127.0.0.1:5000/api/organs/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                available_donors: newValue
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            document.getElementById(`donor-${id}`).innerText = newValue;
+        } else {
+            alert(data.message || "Update failed");
+        }
+
+    } catch (err) {
+        console.log(err);
+        alert("Server error");
+    }
+}
+
+window.onload = loadOrgans;
+
+</script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Available Donors</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body { background:#f4f7fb; font-family:Arial; }
+.navbar { background:#4682B4; }
+.navbar-brand { color:white!important; font-size:24px; font-weight:bold; }
+
+.heading { text-align:center; margin:25px 0; color:#4682B4; }
+
+.total-box {
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+    margin-bottom:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.card {
+    border:none;
+    border-radius:12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-contact {
+    background:#4682B4;
+    color:white;
+}
+</style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg">
+<div class="container">
+
+<a class="navbar-brand" href="index.html">
+Organ Donation Management
+</a>
+
+<a href="index.html" class="btn btn-light">
+🏠 Home
+</a>
+
+</div>
+</nav>
+
+
+<div class="container">
+
+<h2 class="heading">Available Organ Donors</h2>
+
+<div class="total-box">
+    <h5>Total Donors</h5>
+    <h2 id="total">0</h2>
+</div>
+
+<div class="row g-4" id="donorContainer"></div>
+
+</div>
+
+<script>
+
+async function loadDonors() {
+
+    try {
+
+        const response =
+        await fetch(
+        "http://127.0.0.1:5000/api/donors"
+        );
+
+        if (!response.ok) {
+            throw new Error(
+            "Server Error: "
+            + response.status
+            );
+        }
+
+        const donors =
+        await response.json();
+
+        console.log(
+        "DONORS:",
+        donors
+        );
+
+        document.getElementById(
+        "total"
+        ).innerText =
+        donors.length;
+
+        const container =
+        document.getElementById(
+        "donorContainer"
+        );
+
+        container.innerHTML = "";
+
+        // Check if page opened by admin
+        const isAdmin =
+        new URLSearchParams(
+        window.location.search
+        ).get("admin");
+
+
+        donors.forEach(d => {
+
+            let buttonHTML = "";
+
+            // ADMIN VIEW
+            if(isAdmin === "true"){
+
+                // Already donated
+                if(
+                    d.donation_status ===
+                    "Donated"
+                ){
+
+                    buttonHTML = `
+                    <button
+                    class="btn btn-success w-100"
+                    disabled>
+
+                    Donated ✓
+
+                    </button>
+                    `;
+                }
+
+                // Not donated yet
+                else{
+
+                    buttonHTML = `
+                    <button
+                    class="btn btn-danger w-100"
+
+                    onclick=
+                    "markAsDonated(
+                    ${d.donor_id}
+                    )">
+
+                    Donated
+
+                    </button>
+                    `;
+                }
+            }
+
+            // NORMAL USER VIEW
+            // NORMAL USER VIEW
+else{
+
+    // If donor already donated
+    if(
+        d.donation_status ===
+        "Donated"
+    ){
+
+        buttonHTML = `
+        <button
+        class="btn btn-secondary w-100"
+        disabled>
+
+        Already Donated
+
+        </button>
+        `;
+    }
+
+    // If donor not donated
+    else{
+
+        buttonHTML = `
+        <a href="tel:${d.phone}"
+        class="btn btn-contact w-100">
+
+        Contact
+
+        </a>
+        `;
+    }
+}
+
+
+            container.innerHTML += `
+            <div class="col-md-4">
+
+                <div class="card p-3">
+
+                    <h5>
+                    ${d.full_name}
+                    </h5>
+
+                    <hr>
+
+                    <p>
+                    <b>Age:</b>
+                    ${d.age}
+                    </p>
+
+                    <p>
+                    <b>Blood:</b>
+                    ${d.blood_group}
+                    </p>
+
+                    <p>
+                    <b>Organ:</b>
+                    ${d.organ}
+                    </p>
+
+                    <p>
+                    <b>Status:</b>
+                    ${d.medical_status}
+                    </p>
+
+                    <p>
+                    <b>Type:</b>
+                    ${d.donation_type}
+                    </p>
+
+                    <p>
+                    <b>Phone:</b>
+                    ${d.phone}
+                    </p>
+
+                    <p>
+                    <b>Donation:</b>
+                    ${d.donation_status}
+                    </p>
+
+                    ${buttonHTML}
+
+                </div>
+
+            </div>`;
+        });
+
+    }
+
+    catch (err) {
+
+        console.log(err);
+
+        document.getElementById(
+        "donorContainer"
+        ).innerHTML =
+
+        "<h4 class='text-danger text-center'>Failed to load data</h4>";
+    }
+}
+
+
+// MARK AS DONATED
+async function markAsDonated(
+donorId
+){
+
+    const confirmDonate =
+    confirm(
+    "Mark donor as donated?"
+    );
+
+    if(!confirmDonate){
+        return;
+    }
+
+    try{
+
+        const response =
+        await fetch(
+
+        `http://127.0.0.1:5000/api/donor/${donorId}/donated`,
+
+        {
+            method:"PUT"
+        });
+
+        const data =
+        await response.json();
+
+        alert(
+        data.message
+        );
+
+        // Refresh page
+        loadDonors();
+
+    }
+
+    catch(error){
+
+        console.log(error);
+
+        alert(
+        "Failed to update donor"
+        );
+    }
+}
+
+window.onload =
+loadDonors;
+
+</script>
+
+</body>
+</html>

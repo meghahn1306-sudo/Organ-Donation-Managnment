@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Organ Donation Management</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+
+body{
+    background:#f4f7fb;
+    font-family:Arial, sans-serif;
+}
+
+.navbar{
+    background:#4682B4;
+}
+
+.navbar-brand{
+    color:white !important;
+    font-weight:bold;
+    font-size:28px;
+}
+
+.section-title{
+    text-align:center;
+    margin-top:40px;
+    margin-bottom:30px;
+    color:#4682B4;
+    font-weight:bold;
+}
+
+.dashboard-box{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+
+.dashboard-box:hover{
+    transform:translateY(-5px);
+}
+
+.dashboard-box h2{
+    color:#4682B4;
+    font-size:35px;
+    font-weight:bold;
+}
+.dashboard-box{
+    height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.dashboard-box:hover{
+    transform: translateY(-5px);
+}
+
+.count{
+    font-size: 40px;
+    font-weight: bold;
+    color: #4682B4;
+    margin: 0;
+}
+
+.label{
+    font-size: 16px;
+    font-weight: 600;
+    margin: 5px 0 0 0;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg">
+<div class="container">
+
+<a class="navbar-brand"
+href="index.html">
+
+Organ Donation Management
+
+</a>
+
+<div class="ms-auto">
+
+<a href="index.html"
+class="btn btn-light">
+
+Home
+
+</a>
+
+</div>
+
+</div>
+</nav>
+
+<!-- Page Title -->
+<h2 class="section-title">
+Admin Panel
+</h2>
+
+<!-- Dashboard -->
+<div class="container">
+
+<div class="row g-4">
+
+<!-- Total Donors -->
+<div class="col-md-3">
+
+<a href="total_donors.html?admin=true"
+style="text-decoration:none; color:black;">
+
+<div class="dashboard-box">
+
+<h2 id="donorCount">0</h2>
+
+<p>Total Donors</p>
+
+</div>
+
+</a>
+
+</div>
+
+
+<!-- Available Organs -->
+<div class="col-md-3">
+
+<a href="organ-availability.html"
+style="text-decoration:none; color:black;">
+
+<div class="dashboard-box">
+
+<h2 id="organCount">0</h2>
+
+<p>Available Organs</p>
+
+</div>
+
+</a>
+
+</div>
+
+
+<!-- Emergency Requests -->
+<div class="col-md-3">
+
+<a href="emergency-requests.html?admin=true"
+style="text-decoration:none; color:black;">
+
+<div class="dashboard-box">
+
+<h2 id="emergencyCount">0</h2>
+
+<p>Emergency Requests</p>
+
+</div>
+
+</a>
+
+</div>
+
+
+<!-- Total Recipients -->
+<div class="col-md-3">
+
+<a href="total_recipients.html?admin=true"
+style="text-decoration:none; color:black;">
+
+<div class="dashboard-box">
+
+<h2 id="recipientCount">0</h2>
+
+<p>Total Recipients</p>
+
+</div>
+
+</a>
+
+</div>
+
+<div class="col-md-3">
+
+<a href="hospital-management.html?admin=true"
+style="text-decoration:none; color:black;">
+
+<div class="dashboard-box">
+
+<h2 id="hospitalCount">0</h2>
+
+<p>Hospital-Management</p>
+
+</div>
+
+</a>
+
+</div>
+
+<div class="col-md-3">
+
+<a href="organ-availability.html?admin=true"
+style="text-decoration:none; color:black;">
+
+<div class="dashboard-box">
+
+<p>Available Organs</p>
+
+</div>
+
+</a>
+
+</div>
+
+<div class="col-md-3 d-flex">
+
+<a href="add_hospital.html?admin=true"
+style="text-decoration:none; color:black;">
+
+<div class="dashboard-box w-100">
+
+<p>Register new Hospital</p>
+
+</div>
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+async function loadAdminDashboard(){
+
+    try{
+
+        // ---------------- TOTAL DONORS ----------------
+        const donorResponse =
+        await fetch("http://127.0.0.1:5000/api/donors");
+
+        const donors = await donorResponse.json();
+
+        document.getElementById("donorCount").innerText =
+        donors.length;
+
+
+        // ---------------- AVAILABLE ORGANS ----------------
+        const organResponse =
+        await fetch("http://127.0.0.1:5000/api/organs");
+
+        const organs = await organResponse.json();
+
+        document.getElementById("organCount").innerText =
+        organs.length;
+
+
+        // ---------------- EMERGENCY REQUESTS ----------------
+        const emergencyResponse =
+        await fetch("http://127.0.0.1:5000/api/emergency");
+
+        const emergency = await emergencyResponse.json();
+
+        // ✅ FIXED: normalize status safely
+        const activeEmergency = emergency.filter(e => {
+
+            const status = (e.status || "").toLowerCase().trim();
+
+            // Only count NON-resolved requests
+            return status !== "resolved";
+        });
+
+        document.getElementById("emergencyCount").innerText =
+        activeEmergency.length;
+
+
+        // ---------------- TOTAL RECIPIENTS ----------------
+        const recipientResponse =
+        await fetch("http://127.0.0.1:5000/api/recipients");
+
+        const recipients = await recipientResponse.json();
+
+        document.getElementById("recipientCount").innerText =
+        recipients.length;
+
+    }
+
+    catch(error){
+        console.log("Dashboard Error:", error);
+        alert("Failed to load dashboard data");
+    }
+}
+
+
+// Load data automatically
+window.onload = loadAdminDashboard;
+
+async function loadHospitalCount() {
+    try {
+        const res = await fetch("http://127.0.0.1:5000/api/hospitals");
+        const data = await res.json();
+
+        document.getElementById("hospitalCount").innerText = data.length;
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+window.onload = loadHospitalCount;
+
+const isAdmin = new URLSearchParams(window.location.search).get("admin") === "true";
+
+async function loadOrgans() {
+
+    try {
+        const response = await fetch("http://127.0.0.1:5000/api/organs");
+        const organs = await response.json();
+
+        const container = document.getElementById("organContainer");
+        container.innerHTML = "";
+
+        organs.forEach(o => {
+
+            let statusClass = (o.status === "Available")
+                ? "status-available"
+                : "status-limited";
+
+            // ---------------- DONOR UI ----------------
+            let donorUI = "";
+
+            if (isAdmin) {
+
+                donorUI = `
+                <div class="d-flex justify-content-center align-items-center gap-2 mb-2">
+
+                    <button class="btn btn-danger btn-circle"
+                        onclick="updateDonors(${o.id}, -1)">−</button>
+
+                    <span id="donor-${o.id}" class="fw-bold fs-5">
+                        ${o.available_donors}
+                    </span>
+
+                    <button class="btn btn-success btn-circle"
+                        onclick="updateDonors(${o.id}, 1)">+</button>
+
+                </div>`;
+
+            } else {
+
+                donorUI = `
+                <p><strong>Available Donors:</strong> ${o.available_donors}</p>
+                `;
+            }
+
+            // ---------------- CARD ----------------
+            container.innerHTML += `
+            <div class="col-md-4">
+                <div class="card p-4 text-center">
+
+                    <h3>${o.organ_name}</h3>
+
+                    <p><strong>Hospital:</strong> ${o.hospital_name || "N/A"}</p>
+
+                    <hr>
+
+                    <p><strong>Blood Group:</strong> ${o.blood_group}</p>
+
+                    ${donorUI}
+
+                    <p>
+                        <strong>Status:</strong>
+                        <span class="${statusClass}">
+                            ${o.status}
+                        </span>
+                    </p>
+
+                </div>
+            </div>`;
+        });
+
+    } catch (err) {
+        console.log(err);
+        document.getElementById("organContainer").innerHTML =
+            "<h4 class='text-danger text-center'>Failed to load organ data</h4>";
+    }
+}
+
+// ---------------- UPDATE DONORS (ADMIN ONLY) ----------------
+async function updateDonors(id, change) {
+
+    if (!isAdmin) {
+        alert("Unauthorized access");
+        return;
+    }
+
+    let el = document.getElementById(`donor-${id}`);
+    let current = parseInt(el.innerText);
+
+    let newValue = current + change;
+
+    if (newValue < 0) return;
+
+    try {
+        const res = await fetch(`http://127.0.0.1:5000/api/organs/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                available_donors: newValue
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            el.innerText = newValue;
+        } else {
+            alert(data.error || data.message || "Update failed");
+        }
+
+    } catch (err) {
+        console.log(err);
+        alert("Server error");
+    }
+}
+
+window.onload = loadOrgans;
+
+window.onload = function () {
+    loadAdminDashboard();
+    loadHospitalCount();
+    loadOrgansCount();
+};
+
+
+</script>
+
+</body>
+</html>

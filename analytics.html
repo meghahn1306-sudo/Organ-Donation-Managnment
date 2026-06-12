@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Analytics Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+    background:#f4f7fb;
+    font-family:Arial, sans-serif;
+}
+
+.navbar{
+    background:#4682B4;
+}
+
+.navbar-brand{
+    color:white !important;
+    font-size:28px;
+    font-weight:bold;
+}
+
+.heading{
+    text-align:center;
+    color:#4682B4;
+    margin:40px 0;
+    font-weight:bold;
+}
+
+.card{
+    border:none;
+    border-radius:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    transition:0.3s;
+    cursor:pointer;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.analytics-card{
+    text-align:center;
+    padding:30px;
+}
+
+.chart-container{
+    background:white;
+    padding:20px;
+    border-radius:20px;
+    margin:40px auto;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    width:70%;
+    max-width:700px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg">
+<div class="container">
+
+<a class="navbar-brand" href="index.html">Organ Donation Management</a>
+
+<a href="index.html" class="btn btn-light">🏠 Home</a>
+
+</div>
+</nav>
+
+<div class="container">
+
+<h2 class="heading">AI Analytics Dashboard</h2>
+
+<!-- SUMMARY CARDS -->
+<div class="row g-4">
+
+<div class="col-md-4">
+<div class="card analytics-card" onclick="showDonorGraph()">
+<h2 id="donorsCount">0</h2>
+<h4>Total Donors</h4>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card analytics-card" onclick="showRecipientGraph()">
+<h2 id="recipientsCount">0</h2>
+<h4>Total Recipients</h4>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card analytics-card" onclick="showMatchGraph()">
+<h2 id="matchesCount">0</h2>
+<h4>Successful Matches</h4>
+</div>
+</div>
+
+</div>
+
+<!-- CHART -->
+<div class="chart-container">
+
+<h3 class="text-center mb-4" id="graphTitle">
+Click Any Card to View Analytics
+</h3>
+
+<canvas id="analyticsChart" style="height:300px;"></canvas>
+
+</div>
+
+</div>
+
+<script>
+
+let chart;
+
+// destroy previous chart
+function destroyChart(){
+    if(chart){
+        chart.destroy();
+    }
+}
+
+// ---------------- LOAD SUMMARY ----------------
+async function loadSummary(){
+    try {
+        const res = await fetch("http://127.0.0.1:5000/api/analytics/summary");
+        const data = await res.json();
+
+        document.getElementById("donorsCount").innerText = data.donors;
+        document.getElementById("recipientsCount").innerText = data.recipients;
+        document.getElementById("matchesCount").innerText = data.matches;
+
+    } catch(err){
+        console.log("Summary error:", err);
+    }
+}
+
+// ---------------- DONOR GRAPH ----------------
+async function showDonorGraph(){
+
+destroyChart();
+
+document.getElementById("graphTitle").innerText =
+"Organ-wise Donor Distribution";
+
+try {
+    const res = await fetch("http://127.0.0.1:5000/api/analytics/donors_by_organ");
+    const data = await res.json();
+
+    let labels = data.map(r => r.organ);
+    let values = data.map(r => r.count);
+
+    const ctx = document.getElementById("analyticsChart");
+
+    chart = new Chart(ctx,{
+        type:"bar",
+        data:{
+            labels:labels,
+            datasets:[{
+                label:"Donors",
+                data:values
+            }]
+        }
+    });
+
+} catch(err){
+    console.log(err);
+}
+
+}
+
+// ---------------- RECIPIENT GRAPH ----------------
+async function showRecipientGraph(){
+
+destroyChart();
+
+document.getElementById("graphTitle").innerText =
+"Recipient Blood Group Analysis";
+
+try {
+    const res = await fetch("http://127.0.0.1:5000/api/analytics/recipients_by_blood");
+    const data = await res.json();
+
+    let labels = data.map(r => r.blood_group);
+    let values = data.map(r => r.count);
+
+    const ctx = document.getElementById("analyticsChart");
+
+    chart = new Chart(ctx,{
+        type:"pie",
+        data:{
+            labels:labels,
+            datasets:[{
+                data:values
+            }]
+        }
+    });
+
+} catch(err){
+    console.log(err);
+}
+
+}
+
+// ---------------- MATCH GRAPH ----------------
+async function showMatchGraph(){
+
+destroyChart();
+
+document.getElementById("graphTitle").innerText =
+"Monthly Successful Matches";
+
+try {
+    const res = await fetch("http://127.0.0.1:5000/api/analytics/monthly_matches");
+    const data = await res.json();
+
+    let labels = data.map(r => r.month);
+    let values = data.map(r => r.count);
+
+    const ctx = document.getElementById("analyticsChart");
+
+    chart = new Chart(ctx,{
+        type:"line",
+        data:{
+            labels:labels,
+            datasets:[{
+                label:"Matches",
+                data:values,
+                fill:false
+            }]
+        }
+    });
+
+} catch(err){
+    console.log(err);
+}
+
+}
+
+// ---------------- INIT ----------------
+window.onload = function(){
+    loadSummary();
+};
+
+</script>
+
+</body>
+</html>

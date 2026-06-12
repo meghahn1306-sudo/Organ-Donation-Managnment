@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Emergency Requests</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f4f7fb;
+    font-family:Arial, sans-serif;
+}
+
+.navbar{
+    background:#4682B4;
+}
+
+.navbar-brand{
+    color:white !important;
+    font-weight:bold;
+    font-size:28px;
+}
+
+.heading{
+    text-align:center;
+    margin:40px 0;
+    color:#4682B4;
+    font-weight:bold;
+}
+
+.card{
+    border:none;
+    border-radius:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.btn-custom{
+    background:#4682B4;
+    color:white;
+    border:none;
+}
+
+.btn-custom:hover{
+    background:#5a9bd5;
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+<div class="container">
+    <a class="navbar-brand" href="index.html">Organ Donation Management</a>
+    <a href="index.html" class="btn btn-light">🏠 Home</a>
+</div>
+</nav>
+
+<div class="container">
+    <h2 class="heading">Emergency Organ Requests</h2>
+    <div class="row g-4" id="emergencyContainer"></div>
+</div>
+
+<script>
+
+async function loadEmergency() {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/api/emergency", {
+            cache: "no-store"
+        });
+
+        const requests = await response.json();
+
+        const container = document.getElementById("emergencyContainer");
+        container.innerHTML = "";
+
+        const isAdmin =
+            new URLSearchParams(window.location.search).get("admin") === "true";
+
+        requests.forEach(r => {
+
+            // ✅ SAFE STATUS NORMALIZATION
+            const status = String(r.status || "").toLowerCase().trim();
+
+            let buttonHTML = "";
+
+            // ================= ADMIN VIEW =================
+            if (isAdmin) {
+
+                if (status === "resolved") {
+                    buttonHTML = `
+                        <button class="btn btn-success w-100" disabled>
+                            Satisfied ✓
+                        </button>`;
+                } else {
+                    buttonHTML = `
+                        <button class="btn btn-danger w-100"
+                            onclick="markEmergency(${r.request_id})">
+                            Mark as Satisfied
+                        </button>`;
+                }
+            }
+
+            // ================= USER VIEW =================
+            else {
+
+                if (status === "resolved") {
+                    buttonHTML = `
+                        <button class="btn btn-secondary w-100" disabled>
+                            Contact Disabled
+                        </button>`;
+                } else {
+                    buttonHTML = `
+                        <a href="tel:${r.contact_number}" class="btn btn-custom w-100">
+                            Contact Hospital
+                        </a>`;
+                }
+            }
+
+            container.innerHTML += `
+                <div class="col-md-6">
+                    <div class="card p-4 text-center">
+
+                        <h4>${r.required_organ} Needed</h4>
+                        <hr>
+
+                        <p><b>Patient:</b> ${r.patient_name}</p>
+                        <p><b>Age:</b> ${r.age}</p>
+                        <p><b>Blood Group:</b> ${r.blood_group}</p>
+                        <p><b>Urgency:</b> ${r.urgency_level}</p>
+                        <p><b>Doctor:</b> ${r.doctor_name}</p>
+                        <p><b>Contact:</b> ${r.contact_number}</p>
+
+                        ${buttonHTML}
+
+                    </div>
+                </div>`;
+        });
+
+    } catch (err) {
+        console.error("LOAD ERROR:", err);
+        document.getElementById("emergencyContainer").innerHTML =
+            "<h4 class='text-danger'>Failed to load data</h4>";
+    }
+}
+
+
+// ================= ADMIN ACTION =================
+async function markEmergency(id) {
+    try {
+        const res = await fetch(
+            `http://127.0.0.1:5000/api/emergency/${id}/resolve`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        console.log("STATUS CODE:", res.status);
+        console.log("SERVER RESPONSE:", data);
+
+        if (!res.ok) {
+            throw new Error(data.error || "Update failed");
+        }
+
+        alert(data.message || "Updated successfully");
+
+        // 🔥 force refresh after DB update
+        setTimeout(loadEmergency, 300);
+
+    } catch (err) {
+        console.error("UPDATE ERROR:", err);
+        alert(err.message);
+    }
+}
+
+window.onload = loadEmergency;
+
+</script>
+</body>
+</html>

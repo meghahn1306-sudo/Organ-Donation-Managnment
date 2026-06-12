@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Add Hospital - LifeLink</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f4f7fb;
+    font-family:Arial;
+}
+
+.container{
+    max-width:600px;
+    margin-top:50px;
+}
+
+.card{
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+.navbar{
+    background:#4682B4
+}
+.dashboard-box{
+    background-color: #4682B4;
+    color: white;   /* optional for readability */
+}
+.bg-primary {
+    background-color: #4682B4 !important;
+}
+.btn-primary {
+    background-color: #4682B4 !important;
+    border-color: #4682B4 !important;
+}
+
+</style>
+</head>
+
+<body>
+<nav class="navbar navbar-dark bg-primary p-3">
+    <a class="navbar-brand text-white" href="#">Organ Doation Managnment</a>
+    <a href="index.html" class="btn btn-light">🏠 Home</a>
+</nav>
+
+<div class="container">
+
+<div class="card">
+<h3 class="text-center mb-4">Register New Hospital</h3>
+
+<form id="hospitalForm">
+
+    <input class="form-control mb-2" type="text" id="hospital_name" placeholder="Hospital Name" required>
+
+    <input class="form-control mb-2" type="text" id="location" placeholder="Location" required>
+
+    <input class="form-control mb-2" type="number" id="icu_beds" placeholder="ICU Beds" required>
+
+    <input class="form-control mb-2" type="number" id="doctors" placeholder="Doctors" required>
+
+    <input class="form-control mb-2" type="text" id="specialization" placeholder="Specialization" required>
+
+    <input class="form-control mb-3" type="text" id="contact_number" placeholder="Contact Number" required>
+
+    <button class="btn btn-primary w-100" type="submit">
+        Add Hospital
+    </button>
+
+</form>
+
+</div>
+</div>
+
+<script>
+document.getElementById("hospitalForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const data = {
+        hospital_name: document.getElementById("hospital_name").value,
+        location: document.getElementById("location").value,
+        icu_beds: document.getElementById("icu_beds").value,
+        doctors: document.getElementById("doctors").value,
+        specialization: document.getElementById("specialization").value,
+        contact_number: document.getElementById("contact_number").value
+    };
+
+    const res = await fetch("http://127.0.0.1:5000/api/hospitals", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+    alert(result.message || "Hospital added");
+
+    this.reset();
+});
+</script>
+
+</body>
+</html>
