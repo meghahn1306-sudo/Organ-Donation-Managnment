@@ -1,0 +1,206 @@
+mysql> use od;
+Database changed
+mysql> show tables;
++-----------------------+
+| Tables_in_od          |
++-----------------------+
+| admin_login           |
+| donor_recipient_match |
+| donors                |
+| emergency_requests    |
+| hospitals             |
+| organ_availability    |
+| recipients            |
+| users                 |
++-----------------------+
+
+
+mysql> desc admin_login;
++----------+--------------+------+-----+---------+----------------+
+| Field    | Type         | Null | Key | Default | Extra          |
++----------+--------------+------+-----+---------+----------------+
+| admin_id | int          | NO   | PRI | NULL    | auto_increment |
+| username | varchar(50)  | YES  |     | NULL    |                |
+| password | varchar(100) | YES  |     | NULL    |                |
++----------+--------------+------+-----+---------+----------------+
+
+mysql> desc  donor_recipient_match;
++---------------+-------------+------+-----+---------+----------------+
+| Field         | Type        | Null | Key | Default | Extra          |
++---------------+-------------+------+-----+---------+----------------+
+| match_id      | int         | NO   | PRI | NULL    | auto_increment |
+| donor_id      | int         | YES  | MUL | NULL    |                |
+| recipient_id  | int         | YES  | MUL | NULL    |                |
+| matched_organ | varchar(50) | YES  |     | NULL    |                |
+| match_status  | varchar(30) | YES  |     | NULL    |                |
++---------------+-------------+------+-----+---------+----------------+
+
+mysql> desc donors;
++-------------------+--------------+------+-----+-------------------+-------------------+
+| Field             | Type         | Null | Key | Default           | Extra             |
++-------------------+--------------+------+-----+-------------------+-------------------+
+| donor_id          | int          | NO   | PRI | NULL              | auto_increment    |
+| full_name         | varchar(100) | NO   |     | NULL              |                   |
+| age               | int          | NO   |     | NULL              |                   |
+| blood_group       | varchar(10)  | NO   |     | NULL              |                   |
+| organ             | varchar(50)  | NO   |     | NULL              |                   |
+| medical_status    | varchar(20)  | YES  |     | NULL              |                   |
+| donation_type     | varchar(50)  | YES  |     | NULL              |                   |
+| phone             | varchar(15)  | YES  |     | NULL              |                   |
+| registration_date | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| donation_status   | varchar(20)  | YES  |     | Not Donated       |                   |
++-------------------+--------------+------+-----+-------------------+-------------------+
+
+mysql> desc emergency_requests;
++----------------+--------------+------+-----+---------+----------------+
+| Field          | Type         | Null | Key | Default | Extra          |
++----------------+--------------+------+-----+---------+----------------+
+| request_id     | int          | NO   | PRI | NULL    | auto_increment |
+| patient_name   | varchar(100) | YES  |     | NULL    |                |
+| age            | int          | YES  |     | NULL    |                |
+| blood_group    | varchar(10)  | YES  |     | NULL    |                |
+| required_organ | varchar(50)  | YES  |     | NULL    |                |
+| urgency_level  | varchar(30)  | YES  |     | NULL    |                |
+| hospital_id    | int          | YES  | MUL | NULL    |                |
+| doctor_name    | varchar(100) | YES  |     | NULL    |                |
+| contact_number | varchar(15)  | YES  |     | NULL    |                |
+| status         | varchar(20)  | YES  |     | Pending |                |
++----------------+--------------+------+-----+---------+----------------+
+
+mysql> desc hospitals;
++----------------+--------------+------+-----+---------+----------------+
+| Field          | Type         | Null | Key | Default | Extra          |
++----------------+--------------+------+-----+---------+----------------+
+| hospital_id    | int          | NO   | PRI | NULL    | auto_increment |
+| hospital_name  | varchar(100) | YES  |     | NULL    |                |
+| location       | varchar(100) | YES  |     | NULL    |                |
+| icu_beds       | int          | YES  |     | NULL    |                |
+| doctors        | int          | YES  |     | NULL    |                |
+| specialization | varchar(100) | YES  |     | NULL    |                |
+| contact_number | varchar(15)  | YES  |     | NULL    |                |
++----------------+--------------+------+-----+---------+----------------+
+
+mysql> desc organ_availability;
++------------------+-------------+------+-----+---------+----------------+
+| Field            | Type        | Null | Key | Default | Extra          |
++------------------+-------------+------+-----+---------+----------------+
+| organ_id         | int         | NO   | PRI | NULL    | auto_increment |
+| organ_name       | varchar(50) | YES  |     | NULL    |                |
+| blood_group      | varchar(10) | YES  |     | NULL    |                |
+| available_donors | int         | YES  |     | NULL    |                |
+| hospital_id      | int         | YES  | MUL | NULL    |                |
+| status           | varchar(20) | YES  |     | NULL    |                |
++------------------+-------------+------+-----+---------+----------------+
+
+mysql> desc recipients;
++-------------------+--------------+------+-----+-------------------+-------------------+
+| Field             | Type         | Null | Key | Default           | Extra             |
++-------------------+--------------+------+-----+-------------------+-------------------+
+| recipient_id      | int          | NO   | PRI | NULL              | auto_increment    |
+| full_name         | varchar(100) | YES  |     | NULL              |                   |
+| age               | int          | YES  |     | NULL              |                   |
+| blood_group       | varchar(10)  | YES  |     | NULL              |                   |
+| required_organ    | varchar(50)  | YES  |     | NULL              |                   |
+| urgency_level     | varchar(30)  | YES  |     | NULL              |                   |
+| medical_condition | varchar(100) | YES  |     | NULL              |                   |
+| phone             | varchar(15)  | YES  |     | NULL              |                   |
+| registration_date | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| organ_received    | varchar(20)  | YES  |     | Not Received      |                   |
++-------------------+--------------+------+-----+-------------------+-------------------+
+
+mysql> desc users;
++------------+--------------+------+-----+-------------------+-------------------+
+| Field      | Type         | Null | Key | Default           | Extra             |
++------------+--------------+------+-----+-------------------+-------------------+
+| user_id    | int          | NO   | PRI | NULL              | auto_increment    |
+| username   | varchar(100) | NO   |     | NULL              |                   |
+| password   | varchar(100) | NO   |     | NULL              |                   |
+| login_time | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++------------+--------------+------+-----+-------------------+-------------------+
+
+mysql> select*from admin_login;
++----------+----------+----------+
+| admin_id | username | password |
++----------+----------+----------+
+|        1 | admin    | admin123 |
++----------+----------+----------+
+
+mysql> select*from  donor_recipient_match;
++----------+----------+--------------+---------------+--------------+
+| match_id | donor_id | recipient_id | matched_organ | match_status |
++----------+----------+--------------+---------------+--------------+
+|        1 |        1 |            1 | Kidney        | Successful   |
+|        2 |        2 |            2 | Liver         | Pending      |
+|        3 |        3 |            3 | Heart         | Successful   |
++----------+----------+--------------+---------------+--------------+
+
+mysql> select*from  donors;
++----------+--------------+-----+-------------+----------+----------------+----------------+------------+---------------------+-----------------+
+| donor_id | full_name    | age | blood_group | organ    | medical_status | donation_type  | phone      | registration_date   | donation_status |
++----------+--------------+-----+-------------+----------+----------------+----------------+------------+---------------------+-----------------+
+|        1 | Rahul Sharma |  28 | O+          | Kidney   | Healthy        | Live Donor     | 9876543210 | 2026-05-14 20:40:50 | Not Donated     |
+|        2 | Priya Verma  |  31 | A+          | Liver    | Healthy        | Live Donor     | 9876512345 | 2026-05-14 20:40:50 | Not Donated     |
+|        3 | Ankit Rao    |  35 | B+          | Heart    | Healthy        | Deceased Donor | 9876598765 | 2026-05-14 20:40:50 | Donated         |
+|        4 | Sneha Reddy  |  26 | AB+         | Lungs    | Healthy        | Live Donor     | 9876587412 | 2026-05-14 20:40:50 | Donated         |
+|        5 | Karthik Nair |  40 | O-          | Kidney   | Unhealthy      | Live Donor     | 9876578523 | 2026-05-14 20:40:50 | Donated         |
+|        6 | hema         |  45 | A+          | Pancreas | Healthy        | Live Donor     | 8887779990 | 2026-05-15 20:27:18 | Not Donated     |
+|        7 | kanka        |  54 | A+          | Heart    | Healthy        | Live Donor     | 6666777733 | 2026-05-15 20:28:55 | Donated         |
+|        8 | ganesh       |  33 | A+          | Kidney   | NULL           | NULL           | 7789726200 | 2026-05-27 19:19:05 | Not Donated     |
+|       10 | Harshitha    |  22 | O+          | Kidney   | Healthy        | Live Donor     | 9876543210 | 2026-05-29 13:52:34 | Not Donated     |
+|       11 | megha        |  20 | A+          | Kidney   | NULL           | NULL           | 6565656565 | 2026-05-29 15:10:25 | Not Donated     |
++----------+--------------+-----+-------------+----------+----------------+----------------+------------+---------------------+-----------------+
+
+mysql> select*from emergency_requests;
++------------+--------------+------+-------------+----------------+---------------+-------------+-------------+----------------+-----------+
+| request_id | patient_name | age  | blood_group | required_organ | urgency_level | hospital_id | doctor_name | contact_number | status    |
++------------+--------------+------+-------------+----------------+---------------+-------------+-------------+----------------+-----------+
+|          1 | Rajesh Kumar |   45 | O+          | Kidney         | High          |           1 | Dr. Sharma  | 9876543210     | satisfied |
+|          2 | Sneha Reddy  |   32 | B+          | Heart          | Critical      |           3 | Dr. Rao     | 9876522222     | resolved  |
+|          3 | Kiran Patel  |   50 | O-          | Kidney         | Critical      |           2 | Dr. Reddy   | 9876501234     | satisfied |
++------------+--------------+------+-------------+----------------+---------------+-------------+-------------+----------------+-----------+
+
+mysql> select*from  hospitals;
++-------------+-------------------+-----------+----------+---------+-------------------+----------------+
+| hospital_id | hospital_name     | location  | icu_beds | doctors | specialization    | contact_number |
++-------------+-------------------+-----------+----------+---------+-------------------+----------------+
+|           1 | Apollo Hospital   | Bangalore |       19 |      28 | Kidney Transplant | 9876543210     |
+|           2 | Manipal Hospital  | Bangalore |       18 |      35 | Liver Transplant  | 9876501234     |
+|           3 | Jayadeva Hospital | Bangalore |       15 |      28 | Heart Transplant  | 9876522222     |
+|           4 | Fortis Hospital   | Bangalore |       20 |      30 | Multi Organ       | 9876511111     |
+|           5 | Narayana Health   | Bangalore |       22 |      38 | Liver Transplant  | 9876512222     |
+|           6 | BGS               | Banglore  |       12 |      30 | Heart             | 9995656000     |
++-------------+-------------------+-----------+----------+---------+-------------------+----------------+
+
+mysql> select*from  organ_availability;
++----------+------------+-------------+------------------+-------------+-----------+
+| organ_id | organ_name | blood_group | available_donors | hospital_id | status    |
++----------+------------+-------------+------------------+-------------+-----------+
+|        1 | Kidney     | O+          |               17 |           1 | Available |
+|        2 | Liver      | A+          |                8 |           2 | Available |
+|        3 | Heart      | B+          |                5 |           3 | Limited   |
+|        4 | Lungs      | AB+         |                8 |           4 | Available |
+|        5 | Pancreas   | O-          |                3 |           5 | Limited   |
++----------+------------+-------------+------------------+-------------+-----------+
+
+mysql> select*from recipients;
++--------------+--------------+------+-------------+----------------+---------------+-------------------+------------+---------------------+----------------+
+| recipient_id | full_name    | age  | blood_group | required_organ | urgency_level | medical_condition | phone      | registration_date   | organ_received |
++--------------+--------------+------+-------------+----------------+---------------+-------------------+------------+---------------------+----------------+
+|            1 | Ramesh Kumar |   45 | O+          | Kidney         | High          | Kidney Failure    | 9988776655 | 2026-05-14 20:40:50 | Received       |
+|            2 | Neha Singh   |   29 | A+          | Liver          | Medium        | Liver Damage      | 9988771122 | 2026-05-14 20:40:50 | Not Received   |
+|            3 | Arjun Rao    |   37 | B+          | Heart          | Critical      | Heart Disease     | 9988779988 | 2026-05-14 20:40:50 | Not Received   |
+|            4 | Pooja Sharma |   33 | AB+         | Lungs          | High          | Lung Infection    | 9988772211 | 2026-05-14 20:40:50 | Not Received   |
+|            5 | Kiran Patel  |   50 | O-          | Kidney         | Critical      | Kidney Failure    | 9988773344 | 2026-05-14 20:40:50 | Received       |
+|            6 | karthik      |   45 | O+          | Kidney         | Critical      | Emergency         | 6665557899 | 2026-05-15 20:52:28 | Not Received   |
+|            7 | karishma     |   33 | A+          | Kidney         | Low           | dialysis          | 7776888900 | 2026-05-15 20:54:05 | Not Received   |
+|            8 | sri          |   56 | A+          | Liver          | Critical      | cancer            | 6666666778 | 2026-05-27 18:49:29 | Not Received   |
+|            9 | ganesh       |   43 | A+          | Kidney         | Medium        | kidney failur     | 6565656565 | 2026-05-27 18:50:39 | Not Received   |
++--------------+--------------+------+-------------+----------------+---------------+-------------------+------------+---------------------+----------------+
+
+mysql> select*from  users;
++---------+----------+-----------+---------------------+
+| user_id | username | password  | login_time          |
++---------+----------+-----------+---------------------+
+|       1 | hemanth  | hem@123   | 2026-05-27 18:39:34 |
+|       2 | kamal    | kamal@123 | 2026-05-27 22:45:18 |
++---------+----------+-----------+---------------------+
